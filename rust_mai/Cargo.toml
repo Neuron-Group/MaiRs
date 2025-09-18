@@ -1,0 +1,16 @@
+[package]
+name = "rust_mai"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+macroquad = "0.4.14"
+general_time_event_driven = { path = "../general_time_event_driven" }
+tokio = { version = "1.47.1", features = [
+  "macros",
+  "rt-multi-thread",
+  "test-util",
+  "tracing",
+] }
+evdev = { version = "0.13.2", features = ["stream-trait", "tokio"] }
+chrono = "0.4.42"

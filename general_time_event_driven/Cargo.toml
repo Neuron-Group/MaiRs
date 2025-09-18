@@ -1,0 +1,18 @@
+[package]
+name = "general_time_event_driven"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+async-priority-queue = "0.1.1"
+ndarray = { version = "0.16.1", features = ["approx", "blas", "docs", "matrixmultiply-threading", "serde", "test"] }
+num-traits = "0.2.19"
+numtraits = "0.0.1"
+tokio = { version = "1.47.1", features = [
+  "macros",
+  "rt-multi-thread",
+  "signal",
+  "sync",
+  "time",
+  "tracing",
+] }
