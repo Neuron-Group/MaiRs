@@ -132,5 +132,7 @@ pub struct WidgetForDisplay {
     pub id: usize,
     pub time_stamp_general: DateTime<Utc>,
     pub time_stamp_display: DateTime<Utc>,
+    pub time_hit: DateTime<Utc>,
+    pub place: WkrType,
     pub deleted: bool,
 }

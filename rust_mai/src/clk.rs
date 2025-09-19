@@ -1,4 +1,5 @@
 use chrono::Utc;
+use general_time_event_driven::types::RuntimeEvent;
 use tokio::{task::JoinHandle, time::Duration};
 
 use crate::types::{Event, RtV};
@@ -7,7 +8,7 @@ const FPS: f32 = 120.0;
 const EVENT_FRAC: u8 = 10;
 
 pub async fn start_clk(
-    sndr_playtrd: tokio::sync::mpsc::Sender<RtV>,
+    sndr_playtrd: tokio::sync::mpsc::Sender<RuntimeEvent<RtV>>,
     sndr_eventtrd: tokio::sync::mpsc::Sender<Event>,
 ) -> JoinHandle<()> {
     tokio::spawn(async move {
@@ -15,6 +16,7 @@ pub async fn start_clk(
         loop {
             cnt += 1;
             cnt %= EVENT_FRAC;
+
             match cnt {
                 0 => sndr_eventtrd
                     .send(Event {
@@ -23,15 +25,18 @@ pub async fn start_clk(
                     })
                     .await
                     .unwrap(),
+
                 _ => sndr_playtrd
-                    .send(RtV {
+                    .send(RuntimeEvent::Some(RtV {
                         is_blank: true,
                         id: 0,
                         judgement: crate::types::Judgement::Good,
-                    })
+                    }))
                     .await
                     .unwrap(),
             }
+
+            // println!("cnt");
 
             tokio::time::sleep(Duration::from_secs_f32(1.0 / FPS)).await;
         }

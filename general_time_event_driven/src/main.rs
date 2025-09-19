@@ -127,7 +127,9 @@ async fn test_worker_pool_process() {
         wkr_ppty: TestWorkerType::Wkr0,
     };
     let widget_list = vec![widget];
-    let (sndr, mut rcvr, hndl) = WorkerPool::build(wrk_ppty, widget_list).await;
+
+    let (rt_evnt_sndr, mut rcvr) = mpsc::channel(100);
+    let (sndr, hndl) = WorkerPool::build(wrk_ppty, widget_list, rt_evnt_sndr).await;
 
     let event = TestEvent {
         time_stamp: 1024,

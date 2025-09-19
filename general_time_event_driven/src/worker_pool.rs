@@ -6,7 +6,7 @@ use tokio::{
     task::JoinHandle,
 };
 
-const BUFFER_LENGTH: usize = 10000;
+const BUFFER_LENGTH: usize = 1000;
 
 struct WorkerHandle<Event: EventTrait, Widget: WidgetTrait<Event = Event>> {
     widget_sender: mpsc::Sender<Widget>,
@@ -96,11 +96,11 @@ impl<Event: EventTrait + 'static, Widget: WidgetTrait<Event = Event> + 'static>
 /// * `WorkerProperty` - 工作属性类型，需实现WorkerPropertyTrait
 pub struct WorkerPool<Event: EventTrait, Widget: WidgetTrait<Event = Event>> {
     // 优先队列线程
-    input_worker_handle: JoinHandle<()>,
+    pub input_worker_handle: JoinHandle<()>,
     _event_broadcast_sender: broadcast::Sender<Arc<Event>>,
 
     // 哈希表路由线程
-    widget_router_handle: JoinHandle<()>,
+    pub widget_router_handle: JoinHandle<()>,
 
     // 预留
     _runtime_widget_sender_pre: mpsc::Sender<Widget>,
@@ -115,6 +115,8 @@ impl<Event: EventTrait + 'static, Widget: WidgetTrait<Event = Event> + 'static>
     ///
     /// # 参数
     /// * `worker_property` - 工作属性列表，包含工作属性、工作模式和事件选择器
+    /// * `widgets` - 组件列表
+    /// * `return_event_sender` - 返回值发送端口
     ///
     /// # 返回值
     /// 元组：(事件发送器, 运行时事件接收器, WorkerPool实例)
@@ -125,14 +127,11 @@ impl<Event: EventTrait + 'static, Widget: WidgetTrait<Event = Event> + 'static>
             Box<dyn Fn(&Event::EventType) -> bool + Send + Sync>,
         )>,
         widgets: Vec<Widget>,
-    ) -> (
-        event_queue::Sender<Event>,
-        mpsc::Receiver<RuntimeEvent<Event::ReturnType>>,
-        Self,
-    ) {
+        return_event_sender: mpsc::Sender<RuntimeEvent<Event::ReturnType>>,
+    ) -> (event_queue::Sender<Event>, Self) {
         let (event_pipe_sender, event_pipe_receiver) = event_queue::channel();
         let (event_transmit, _) = broadcast::channel(BUFFER_LENGTH);
-        let (runtime_event_sender, runtime_event_receiver) = mpsc::channel(BUFFER_LENGTH);
+        // let (runtime_event_sender, runtime_event_receiver) = mpsc::channel(BUFFER_LENGTH);
         let (runtime_widget_sender_pre, mut runtime_widget_receiver_pre) =
             mpsc::channel(BUFFER_LENGTH);
         let workers_table = worker_property
@@ -143,7 +142,7 @@ impl<Event: EventTrait + 'static, Widget: WidgetTrait<Event = Event> + 'static>
                     WorkerHandle::new(
                         event_transmit.subscribe(),
                         e.1,
-                        runtime_event_sender.clone(),
+                        return_event_sender.clone(),
                         runtime_widget_sender_pre.clone(),
                         e.2,
                     ),
@@ -180,7 +179,6 @@ impl<Event: EventTrait + 'static, Widget: WidgetTrait<Event = Event> + 'static>
 
         (
             event_pipe_sender,
-            runtime_event_receiver,
             Self {
                 input_worker_handle,
                 widget_router_handle,

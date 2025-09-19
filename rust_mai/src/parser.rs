@@ -95,6 +95,8 @@ pub fn parse_osu_file<P: AsRef<Path>>(
                     display_time
                 },
                 time_stamp_display: display_time,
+                time_hit: base_time + hit_time,
+                place: wkr_type,
                 deleted: false,
             };
 
