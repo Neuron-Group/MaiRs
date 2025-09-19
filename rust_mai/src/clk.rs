@@ -18,14 +18,15 @@ pub async fn start_clk(
             cnt %= EVENT_FRAC;
 
             match cnt {
-                0 => sndr_eventtrd
-                    .send(Event {
-                        time_stamp: Utc::now(),
-                        event_ppty: crate::types::EventType::All,
-                    })
-                    .await
-                    .unwrap(),
-
+                /*
+                                0 => sndr_eventtrd
+                                    .send(Event {
+                                        time_stamp: Utc::now(),
+                                        event_ppty: crate::types::EventType::All,
+                                    })
+                                    .await
+                                    .unwrap(),
+                */
                 _ => sndr_playtrd
                     .send(RuntimeEvent::Some(RtV {
                         is_blank: true,

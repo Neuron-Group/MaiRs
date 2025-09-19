@@ -45,7 +45,7 @@ async fn main() {
     let base_time = Utc::now() + chrono::Duration::seconds(5);
     let (widget_vec, widget_display_vec) = parse_osu_file(
         "/home/neuron/Projects/rust/RustMai/rust_mai/src/bin/test.txt",
-        Utc::now(),
+        base_time,
         screen_height() as f64 + 1000.,
         velocity.into(),
     );
@@ -137,7 +137,7 @@ async fn main() {
         let return_event = rt_event_rcvr.blocking_recv().unwrap();
         // println!("{return_event:#?}");
         let now = Utc::now();
-        println!("{now}");
+        // println!("{now}");
         sliding_window
             .end_move_while(|e| e.time_stamp_general - chrono::Duration::seconds(5) < now);
         sliding_window.start_move_while(|e| e.deleted);
@@ -165,7 +165,10 @@ async fn main() {
                     block_size.y,
                     GRAY,
                 );
-                if let RuntimeEvent::Some(rtv) = &return_event {
+                if let RuntimeEvent::Some(rtv) = &return_event
+                    && !rtv.is_blank
+                {
+                    println!("{rtv:#?}");
                     if it.id == rtv.id && !rtv.is_blank {
                         draw_rectangle(
                             initial_position_x,

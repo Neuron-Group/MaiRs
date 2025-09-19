@@ -99,7 +99,7 @@ impl WidgetTrait for Widget {
         // 定义判定范围
         let critical_perfect_range = Duration::milliseconds(-1)..=Duration::milliseconds(1);
         let perfect_range = Duration::milliseconds(-5)..=Duration::milliseconds(5);
-        let good_range = Duration::milliseconds(-20)..=Duration::milliseconds(20);
+        let good_range = Duration::milliseconds(-1000)..=Duration::milliseconds(1000);
 
         // 进行判定
         if critical_perfect_range.contains(&relative_time) {

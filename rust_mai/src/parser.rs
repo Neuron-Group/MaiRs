@@ -71,7 +71,7 @@ pub fn parse_osu_file<P: AsRef<Path>>(
 
             // 计算时间戳
             let hit_time = Duration::milliseconds(time_ms);
-            let widget_time = base_time + hit_time - Duration::milliseconds(20); // 提前20ms
+            let widget_time = base_time + hit_time - Duration::milliseconds(1000); // 提前20ms
 
             // 计算显示时间（基于流速和屏幕高度）
             // 这里简化计算，实际可能需要更复杂的公式

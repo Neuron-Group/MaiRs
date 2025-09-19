@@ -39,19 +39,30 @@ impl<Event: EventTrait + 'static, Widget: WidgetTrait<Event = Event> + 'static>
                     if event_selector(&event.as_ref().get_event_property()) {
                         match event_worker_mode {
                             WorkerMode::ProcessOnce => {
-                                if !widget_heap.is_empty()
-                                    && let Some(widget) = widget_heap.peek()
-                                    && widget.time_stamp() <= event.time_stamp()
-                                {
-                                    let mut widget = widget_heap.pop().unwrap();
-                                    let runtime_state = widget.judge(event.as_ref());
-                                    match runtime_state {
-                                        RuntimeState::Pending(runtime_event) => {
-                                            let _ = runtime_event_sender.send(runtime_event).await;
-                                            let _ = runtime_widget_sender_pre.send(widget).await;
-                                        }
-                                        RuntimeState::Ready(runtime_event) => {
-                                            let _ = runtime_event_sender.send(runtime_event).await;
+                                let mut flg = true;
+                                while !widget_heap.is_empty() && flg {
+                                    if let Some(widget) = widget_heap.peek()
+                                        && widget.time_stamp() <= event.time_stamp()
+                                    {
+                                        let mut widget = widget_heap.pop().unwrap();
+                                        let runtime_state = widget.judge(event.as_ref());
+                                        match runtime_state {
+                                            RuntimeState::Pending(runtime_event) => {
+                                                if let RuntimeEvent::Some(_) = runtime_event {
+                                                    flg = false;
+                                                }
+                                                let _ =
+                                                    runtime_event_sender.send(runtime_event).await;
+                                                let _ =
+                                                    runtime_widget_sender_pre.send(widget).await;
+                                            }
+                                            RuntimeState::Ready(runtime_event) => {
+                                                if let RuntimeEvent::Some(_) = runtime_event {
+                                                    flg = false;
+                                                }
+                                                let _ =
+                                                    runtime_event_sender.send(runtime_event).await;
+                                            }
                                         }
                                     }
                                 }
