@@ -129,6 +129,7 @@ impl WidgetTrait for Widget {
 // 渲染组件模块
 #[derive(Debug)]
 pub struct WidgetForDisplay {
+    pub id: usize,
     pub time_stamp_general: DateTime<Utc>,
     pub time_stamp_display: DateTime<Utc>,
     pub deleted: bool,

@@ -1,5 +1,6 @@
 pub mod clk;
 pub mod dev_read;
+pub mod parser;
 pub mod types;
 
 pub fn add(left: u64, right: u64) -> u64 {
