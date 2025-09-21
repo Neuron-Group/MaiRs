@@ -44,7 +44,7 @@ async fn main() {
 
     let base_time = Utc::now() + chrono::Duration::seconds(5);
     let (widget_vec, widget_display_vec) = parse_osu_file(
-        "/home/neuron/Projects/rust/RustMai/rust_mai/src/bin/test.txt",
+        env!("CARGO_MANIFEST_DIR").to_string() + "/src/bin/test.txt",
         base_time,
         screen_height() as f64 + 1000.,
         velocity.into(),
